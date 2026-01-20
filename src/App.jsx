@@ -52,9 +52,9 @@ const App = () => {
         interests: ['Rock Climbing', 'Coffee', 'Books']
       },
       person2: {
-        name: 'Morgan',
+        name: 'Emma',
         age: 23,
-        photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
+        photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
         interests: ['Running', 'Art', 'Pickleball']
       },
       verified: true,
@@ -95,7 +95,7 @@ const App = () => {
     { name: 'Spikeball', icon: '🏐', venue: 'Hillcrest Park', location: 'Provo, UT' },
     { name: 'Axe Throwing', icon: '🪓', venue: 'Heber Hatchets', location: 'Heber, UT' },
     { name: 'Escape Room', icon: '🔐', venue: 'Escapes in Time', location: 'Provo, UT' },
-    { name: 'Golf', icon: '⛳', venue: 'Topgolf', location: 'Salt Lake City, UT' }
+    { name: 'Golf', icon: '⛳', venue: 'Topgolf', location: 'Vineyard, UT' }
   ];
 
   const linkFriend = () => {
@@ -523,7 +523,7 @@ const App = () => {
 
               <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">
                 <MapPin className="inline mr-1" size={14} />
-                All dates are at verified public venues for your safety
+                All four people meet at the venue. No pickups for first dates.
               </div>
             </div>
           ))}
