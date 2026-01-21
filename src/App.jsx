@@ -91,6 +91,9 @@ const App = () => {
   const [friendVote, setFriendVote] = useState(null);
   const [showDateRequest, setShowDateRequest] = useState(false);
   const [pendingMatch, setPendingMatch] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
 
   const activities = [
     { name: 'Pickleball', icon: '🏓', venue: 'Hillcrest Park', location: 'Provo, UT' },
@@ -113,11 +116,12 @@ const App = () => {
     if (friendVote === null) {
       setFriendVote(vote);
       setTimeout(() => {
+        const currentDouble = doubleUnits[currentDoubleIndex];
         if (vote === 'yes' && Math.random() > 0.3) {
-          const currentDouble = doubleUnits[currentDoubleIndex];
           setMatches([...matches, currentDouble]);
           setPendingMatch(currentDouble);
           setShowDateRequest(true);
+          setFriendVote(null);
         } else {
           setWeeklySwipes(weeklySwipes - 1);
           setFriendVote(null);
@@ -127,18 +131,22 @@ const App = () => {
     }
   };
 
-  const scheduleDate = (match, activity) => {
+  const scheduleDate = () => {
+    if (!selectedActivity || !selectedDay || !selectedTime) return;
+    
     setScheduledDates([...scheduledDates, {
       id: Date.now(),
-      match,
-      activity,
-      date: 'This Saturday, 2:00 PM',
+      match: pendingMatch,
+      activity: selectedActivity,
+      date: `${selectedDay}, ${selectedTime}`,
       status: 'confirmed'
     }]);
     setShowDateRequest(false);
     setPendingMatch(null);
+    setSelectedActivity(null);
+    setSelectedDay('');
+    setSelectedTime('');
     setWeeklySwipes(weeklySwipes - 1);
-    setFriendVote(null);
     setCurrentDoubleIndex(currentDoubleIndex + 1);
     setScreen('scheduled-dates');
   };
@@ -337,7 +345,7 @@ const App = () => {
             <div className="text-center mb-6">
               <div className="text-5xl mb-3">🎉</div>
               <h2 className="text-2xl font-bold text-slate-800 mb-2">It's a Match!</h2>
-              <p className="text-slate-600">Choose an activity to get the date on the calendar</p>
+              <p className="text-slate-600">Ask them out by picking an activity and time</p>
             </div>
 
             <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
@@ -350,46 +358,104 @@ const App = () => {
                 <h3 className="font-bold text-slate-800 text-lg">{pendingMatch.person1.name} & {pendingMatch.person2.name}</h3>
               </div>
 
-              <div className="mb-6">
-                <h4 className="font-semibold text-slate-700 mb-3 text-center">Choose an Activity</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {activities.map((activity, i) => (
-                    <button
-                      key={i}
-                      onClick={() => scheduleDate(pendingMatch, activity)}
-                      className="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-500 hover:bg-blue-50 transition text-left"
+              {!selectedActivity ? (
+                <>
+                  <h4 className="font-semibold text-slate-700 mb-3 text-center">Pick an Activity</h4>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    {activities.map((activity, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedActivity(activity)}
+                        className="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-500 hover:bg-blue-50 transition text-left"
+                      >
+                        <div className="text-2xl mb-1">{activity.icon}</div>
+                        <div className="font-semibold text-slate-800 text-sm">{activity.name}</div>
+                        <div className="text-slate-500 text-xs">{activity.venue}</div>
+                        <div className="text-slate-400 text-xs">{activity.location}</div>
+                      </button>
+                    ))}
+                  </div>
+                  <button className="w-full border-2 border-dashed border-slate-300 rounded-xl p-4 text-slate-500 hover:border-slate-400 hover:text-slate-600 transition font-medium text-sm">
+                    + Suggest Custom Activity
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-2xl mb-1">{selectedActivity.icon}</div>
+                        <div className="font-semibold text-slate-800">{selectedActivity.name}</div>
+                        <div className="text-slate-600 text-sm">{selectedActivity.venue}</div>
+                        <div className="text-slate-500 text-xs">{selectedActivity.location}</div>
+                      </div>
+                      <button 
+                        onClick={() => setSelectedActivity(null)}
+                        className="text-slate-400 hover:text-slate-600"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <h4 className="font-semibold text-slate-700 mb-3">When do you want to go?</h4>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm text-slate-600 mb-2">Day</label>
+                    <select 
+                      value={selectedDay}
+                      onChange={(e) => setSelectedDay(e.target.value)}
+                      className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500"
                     >
-                      <div className="text-2xl mb-1">{activity.icon}</div>
-                      <div className="font-semibold text-slate-800 text-sm">{activity.name}</div>
-                      <div className="text-slate-500 text-xs">{activity.venue}</div>
-                      <div className="text-slate-400 text-xs">{activity.location}</div>
-                    </button>
-                  ))}
-                </div>
-                <button className="w-full mt-3 border-2 border-dashed border-slate-300 rounded-xl p-4 text-slate-500 hover:border-slate-400 hover:text-slate-600 transition font-medium text-sm">
-                  + Suggest Custom Activity
-                </button>
-              </div>
+                      <option value="">Choose a day...</option>
+                      <option value="Today">Today</option>
+                      <option value="Tomorrow">Tomorrow</option>
+                      <option value="This Saturday">This Saturday</option>
+                      <option value="This Sunday">This Sunday</option>
+                      <option value="Next Week">Next Week</option>
+                    </select>
+                  </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-                <h4 className="font-semibold text-amber-900 text-sm mb-2">💰 Who Pays?</h4>
-                <p className="text-amber-800 text-xs mb-3">
-                  We recommend splitting costs equally among all four people, or each double covers themselves. Figure out what works for your group!
-                </p>
-                <div className="flex gap-2">
-                  <button className="flex-1 bg-white border border-amber-300 text-amber-900 px-3 py-2 rounded-lg text-xs font-medium hover:bg-amber-100">
-                    Split 4 Ways
-                  </button>
-                  <button className="flex-1 bg-white border border-amber-300 text-amber-900 px-3 py-2 rounded-lg text-xs font-medium hover:bg-amber-100">
-                    Each Double Pays
-                  </button>
-                  <button className="flex-1 bg-white border border-amber-300 text-amber-900 px-3 py-2 rounded-lg text-xs font-medium hover:bg-amber-100">
-                    Discuss Later
-                  </button>
-                </div>
-              </div>
+                  <div className="mb-6">
+                    <label className="block text-sm text-slate-600 mb-2">Time</label>
+                    <select 
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="">Choose a time...</option>
+                      <option value="10:00 AM">10:00 AM</option>
+                      <option value="12:00 PM">12:00 PM</option>
+                      <option value="2:00 PM">2:00 PM</option>
+                      <option value="4:00 PM">4:00 PM</option>
+                      <option value="6:00 PM">6:00 PM</option>
+                      <option value="7:00 PM">7:00 PM</option>
+                      <option value="8:00 PM">8:00 PM</option>
+                    </select>
+                  </div>
 
-              <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">
+                  <button
+                    onClick={scheduleDate}
+                    disabled={!selectedDay || !selectedTime}
+                    className={`w-full py-4 rounded-xl font-semibold transition ${
+                      selectedDay && selectedTime
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    Send Date Request
+                  </button>
+
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4">
+                    <h4 className="font-semibold text-amber-900 text-sm mb-1">💰 Who Pays?</h4>
+                    <p className="text-amber-800 text-xs">
+                      Recommend splitting equally or each double pays. Discuss what works!
+                    </p>
+                  </div>
+                </>
+              )}
+
+              <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600 mt-4">
                 <MapPin className="inline mr-1" size={14} />
                 All four people meet at the venue. No pickups for first dates.
               </div>
