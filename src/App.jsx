@@ -89,6 +89,8 @@ const App = () => {
 
   const [currentDoubleIndex, setCurrentDoubleIndex] = useState(0);
   const [friendVote, setFriendVote] = useState(null);
+  const [showDateRequest, setShowDateRequest] = useState(false);
+  const [pendingMatch, setPendingMatch] = useState(null);
 
   const activities = [
     { name: 'Pickleball', icon: '🏓', venue: 'Hillcrest Park', location: 'Provo, UT' },
@@ -114,10 +116,13 @@ const App = () => {
         if (vote === 'yes' && Math.random() > 0.3) {
           const currentDouble = doubleUnits[currentDoubleIndex];
           setMatches([...matches, currentDouble]);
+          setPendingMatch(currentDouble);
+          setShowDateRequest(true);
+        } else {
+          setWeeklySwipes(weeklySwipes - 1);
+          setFriendVote(null);
+          setCurrentDoubleIndex(currentDoubleIndex + 1);
         }
-        setWeeklySwipes(weeklySwipes - 1);
-        setFriendVote(null);
-        setCurrentDoubleIndex(currentDoubleIndex + 1);
       }, 1000);
     }
   };
@@ -130,6 +135,11 @@ const App = () => {
       date: 'This Saturday, 2:00 PM',
       status: 'confirmed'
     }]);
+    setShowDateRequest(false);
+    setPendingMatch(null);
+    setWeeklySwipes(weeklySwipes - 1);
+    setFriendVote(null);
+    setCurrentDoubleIndex(currentDoubleIndex + 1);
     setScreen('scheduled-dates');
   };
 
@@ -320,6 +330,75 @@ const App = () => {
   }
 
   if (screen === 'browse') {
+    if (showDateRequest && pendingMatch) {
+      return (
+        <div className="min-h-screen bg-slate-50 p-6">
+          <div className="max-w-lg mx-auto">
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-3">🎉</div>
+              <h2 className="text-2xl font-bold text-slate-800 mb-2">It's a Match!</h2>
+              <p className="text-slate-600">Choose an activity to get the date on the calendar</p>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <img src={pendingMatch.person1.photo} alt="" className="w-16 h-16 rounded-full object-cover" />
+                <span className="text-slate-400 text-2xl">+</span>
+                <img src={pendingMatch.person2.photo} alt="" className="w-16 h-16 rounded-full object-cover" />
+              </div>
+              <div className="text-center mb-6">
+                <h3 className="font-bold text-slate-800 text-lg">{pendingMatch.person1.name} & {pendingMatch.person2.name}</h3>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="font-semibold text-slate-700 mb-3 text-center">Choose an Activity</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {activities.map((activity, i) => (
+                    <button
+                      key={i}
+                      onClick={() => scheduleDate(pendingMatch, activity)}
+                      className="border-2 border-slate-200 rounded-xl p-4 hover:border-blue-500 hover:bg-blue-50 transition text-left"
+                    >
+                      <div className="text-2xl mb-1">{activity.icon}</div>
+                      <div className="font-semibold text-slate-800 text-sm">{activity.name}</div>
+                      <div className="text-slate-500 text-xs">{activity.venue}</div>
+                      <div className="text-slate-400 text-xs">{activity.location}</div>
+                    </button>
+                  ))}
+                </div>
+                <button className="w-full mt-3 border-2 border-dashed border-slate-300 rounded-xl p-4 text-slate-500 hover:border-slate-400 hover:text-slate-600 transition font-medium text-sm">
+                  + Suggest Custom Activity
+                </button>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                <h4 className="font-semibold text-amber-900 text-sm mb-2">💰 Who Pays?</h4>
+                <p className="text-amber-800 text-xs mb-3">
+                  We recommend splitting costs equally among all four people, or each double covers themselves. Figure out what works for your group!
+                </p>
+                <div className="flex gap-2">
+                  <button className="flex-1 bg-white border border-amber-300 text-amber-900 px-3 py-2 rounded-lg text-xs font-medium hover:bg-amber-100">
+                    Split 4 Ways
+                  </button>
+                  <button className="flex-1 bg-white border border-amber-300 text-amber-900 px-3 py-2 rounded-lg text-xs font-medium hover:bg-amber-100">
+                    Each Double Pays
+                  </button>
+                  <button className="flex-1 bg-white border border-amber-300 text-amber-900 px-3 py-2 rounded-lg text-xs font-medium hover:bg-amber-100">
+                    Discuss Later
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-600">
+                <MapPin className="inline mr-1" size={14} />
+                All four people meet at the venue. No pickups for first dates.
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     const currentDouble = doubleUnits[currentDoubleIndex];
     
     if (!currentDouble || weeklySwipes === 0) {
@@ -447,10 +526,10 @@ const App = () => {
 
           {matches.length > 0 && (
             <button
-              onClick={() => setScreen('date-request')}
+              onClick={() => setScreen('scheduled-dates')}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 mb-4"
             >
-              View Matches ({matches.length})
+              View Scheduled Dates ({scheduledDates.length})
             </button>
           )}
 
