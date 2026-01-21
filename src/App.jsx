@@ -25,20 +25,22 @@ const App = () => {
     {
       id: 1,
       person1: {
-        name: 'Sam',
-        age: 24,
-        photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+        name: 'Sophie',
+        age: 21,
+        city: 'Provo',
+        photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
         interests: ['Yoga', 'Brunch', 'Museums']
       },
       person2: {
-        name: 'Riley',
-        age: 25,
-        photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
+        name: 'Emma',
+        age: 22,
+        city: 'Provo',
+        photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
         interests: ['Tennis', 'Cooking', 'Trivia']
       },
       verified: true,
       availability: 'Weekend afternoons',
-      trustScore: 95, // High - shows up to dates
+      trustScore: 95,
       datesAttended: 8,
       mutualConnections: ['Sarah Chen', 'Mike Rodriguez'],
       mutualCount: 2
@@ -46,15 +48,17 @@ const App = () => {
     {
       id: 2,
       person1: {
-        name: 'Taylor',
-        age: 22,
-        photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
+        name: 'Jake',
+        age: 20,
+        city: 'Orem',
+        photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
         interests: ['Rock Climbing', 'Coffee', 'Books']
       },
       person2: {
-        name: 'Emma',
-        age: 23,
-        photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
+        name: 'Ryan',
+        age: 21,
+        city: 'Provo',
+        photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
         interests: ['Running', 'Art', 'Pickleball']
       },
       verified: true,
@@ -67,15 +71,17 @@ const App = () => {
     {
       id: 3,
       person1: {
-        name: 'Casey',
-        age: 23,
-        photo: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=400&fit=crop',
+        name: 'Mia',
+        age: 20,
+        city: 'Provo',
+        photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=400&fit=crop',
         interests: ['Photography', 'Hiking', 'Coffee']
       },
       person2: {
-        name: 'Drew',
-        age: 24,
-        photo: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop',
+        name: 'Olivia',
+        age: 21,
+        city: 'Vineyard',
+        photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
         interests: ['Music', 'Cycling', 'Art']
       },
       verified: true,
@@ -84,8 +90,54 @@ const App = () => {
       datesAttended: 6,
       mutualConnections: ['Sarah Chen', 'Alex Park', 'Jamie Lee'],
       mutualCount: 3
+    },
+    {
+      id: 4,
+      person1: {
+        name: 'Ava',
+        age: 19,
+        city: 'Provo',
+        photo: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=400&fit=crop',
+        interests: ['Basketball', 'Movies', 'Food']
+      },
+      person2: {
+        name: 'Isabella',
+        age: 20,
+        city: 'Orem',
+        photo: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=400&fit=crop',
+        interests: ['Volleyball', 'Gaming', 'Cooking']
+      },
+      verified: true,
+      availability: 'Weekend evenings',
+      trustScore: 90,
+      datesAttended: 7,
+      mutualConnections: ['Mike Rodriguez'],
+      mutualCount: 1
+    },
+    {
+      id: 5,
+      person1: {
+        name: 'Lily',
+        age: 21,
+        city: 'Provo',
+        photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
+        interests: ['Swimming', 'Reading', 'Travel']
+      },
+      person2: {
+        name: 'Grace',
+        age: 20,
+        city: 'Provo',
+        photo: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop',
+        interests: ['Dancing', 'Coffee', 'Hiking']
+      },
+      verified: true,
+      availability: 'Weekday mornings',
+      trustScore: 85,
+      datesAttended: 4,
+      mutualConnections: ['Sarah Chen', 'Jordan Kim'],
+      mutualCount: 2
     }
-  ].sort((a, b) => b.trustScore - a.trustScore)); // Sorted by attendance-based trust score
+  ].sort((a, b) => b.trustScore - a.trustScore));
 
   const [currentDoubleIndex, setCurrentDoubleIndex] = useState(0);
   const [friendVote, setFriendVote] = useState(null);
@@ -122,7 +174,9 @@ const App = () => {
           setPendingMatch(currentDouble);
           setShowDateRequest(true);
           setFriendVote(null);
+          // Don't increment index here - wait until they schedule or cancel
         } else {
+          // Only increment on pass
           setWeeklySwipes(weeklySwipes - 1);
           setFriendVote(null);
           setCurrentDoubleIndex(currentDoubleIndex + 1);
@@ -141,13 +195,15 @@ const App = () => {
       date: `${selectedDay}, ${selectedTime}`,
       status: 'confirmed'
     }]);
+    
+    // Clean up and move to next double
     setShowDateRequest(false);
     setPendingMatch(null);
     setSelectedActivity(null);
     setSelectedDay('');
     setSelectedTime('');
     setWeeklySwipes(weeklySwipes - 1);
-    setCurrentDoubleIndex(currentDoubleIndex + 1);
+    setCurrentDoubleIndex(currentDoubleIndex + 1); // Now increment after scheduling
     setScreen('scheduled-dates');
   };
 
@@ -511,15 +567,17 @@ const App = () => {
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
             <div className="grid grid-cols-2 gap-0">
               <div className="relative">
-                <img src={currentDouble.person1.photo} alt="" className="w-full h-80 object-cover" />
+                <img src={currentDouble.person1.photo} alt={currentDouble.person1.name} className="w-full h-80 object-cover" />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                   <h3 className="text-white font-bold text-lg">{currentDouble.person1.name}, {currentDouble.person1.age}</h3>
+                  <p className="text-white/90 text-sm">{currentDouble.person1.city}</p>
                 </div>
               </div>
               <div className="relative">
-                <img src={currentDouble.person2.photo} alt="" className="w-full h-80 object-cover" />
+                <img src={currentDouble.person2.photo} alt={currentDouble.person2.name} className="w-full h-80 object-cover" />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                   <h3 className="text-white font-bold text-lg">{currentDouble.person2.name}, {currentDouble.person2.age}</h3>
+                  <p className="text-white/90 text-sm">{currentDouble.person2.city}</p>
                 </div>
               </div>
             </div>
